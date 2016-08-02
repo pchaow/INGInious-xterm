@@ -16,7 +16,7 @@ Usage (command line)
 --------------------
 
 ```
-npm start hostname port server1=portRangeStart-portRangeStop,port1,port2 server2=port3,port4
+node app [--capath=path-to-cacert.pem --keypath=path-to-private-key.pem] HOST PORT rhostA:portA-portB,portC [rhostA:portA-portB,portC ...]
 ```
 
 example:

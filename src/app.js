@@ -2,34 +2,37 @@ var express = require('express');
 var app = express();
 var expressWs = require('express-ws')(app);
 var os = require('os');
+var fs = require('fs');
 var pty = require('pty.js');
+var argv = require('minimist')(process.argv.slice(2));
+console.dir(argv);
 
 var allowed_hosts = {};
 var re_host = /^[a-z\d]([a-z\d\-]{0,61}[a-z\d])?(\.[a-z\d]([a-z\d\-]{0,61}[a-z\d])?)*$/i;
 
 function usage() {
-  console.log("node app HOST PORT [rhostA:portA-portB,portC ...]");
+  console.log("node app [--capath=path-to-cacert.pem --keypath=path-to-private-key.pem] HOST PORT rhostA:portA-portB,portC [rhostA:portA-portB,portC ...]");
   console.log("Example: node app localhost 3000 localhost:64000-64100 remote.be:22,2222");
   console.log("");
 }
 
 // process args
-if(process.argv.length < 5) {
+if(argv["_"] < 3) {
   usage();
   console.log("Not enough parameters");
   process.exit(1);
 }
 
-bind_hostname = process.argv[2];
-bind_port = parseInt(process.argv[3]);
+bind_hostname = argv["_"][0];
+bind_port = parseInt(argv["_"][1]);
 if(isNaN(bind_port)) {
   usage();
   console.log("The port should be an integer");
   process.exit(1);
 }
 
-process.argv.forEach(function (val, index, array) {
-  if(index > 3) {
+argv["_"].forEach(function (val, index, array) {
+  if(index >= 2) {
     val = val.split(":")
     if(val.length != 2) {
       usage();
@@ -154,5 +157,21 @@ app.ws('/bash', function(ws, req) {
   });
 });
 
-console.log('App listening to http://' + bind_hostname + ':' + bind_port);
-app.listen(bind_port, bind_hostname);
+if(argv["capath"] != undefined && argv["keypath"] != undefined) {
+  var privateKey = fs.readFileSync( argv["keypath"] );
+  var certificate = fs.readFileSync( argv["capath"] );
+
+  console.log('App listening to https://' + bind_hostname + ':' + bind_port);
+  https.createServer({
+      key: privateKey,
+      cert: certificate
+  }, app).listen(bind_port, bind_hostname);
+}
+else if(argv["capath"] != undefined || argv["keypath"] != undefined) {
+  usage();
+  console.log('--capath and --keypath should be defined together or not at all');
+}
+else {
+  console.log('App listening to http://' + bind_hostname + ':' + bind_port);
+  app.listen(bind_port, bind_hostname);
+}
