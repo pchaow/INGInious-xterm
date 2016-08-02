@@ -3,6 +3,7 @@ var app = express();
 var expressWs = require('express-ws')(app);
 var os = require('os');
 var fs = require('fs');
+var https = require('https');
 var pty = require('pty.js');
 var argv = require('minimist')(process.argv.slice(2));
 console.dir(argv);
