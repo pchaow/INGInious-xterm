@@ -12,7 +12,7 @@ var allowed_hosts = {};
 var re_host = /^[a-z\d]([a-z\d\-]{0,61}[a-z\d])?(\.[a-z\d]([a-z\d\-]{0,61}[a-z\d])?)*$/i;
 
 function usage() {
-  console.log("node app [--capath=path-to-cacert.pem --keypath=path-to-private-key.pem] HOST PORT rhostA:portA-portB,portC [rhostA:portA-portB,portC ...]");
+  console.log("node app [--certpath=path-to-cert.pem --keypath=path-to-private.key [--capath=path-to-ca.pem]] HOST PORT rhostA:portA-portB,portC [rhostA:portA-portB,portC ...]");
   console.log("Example: node app localhost 3000 localhost:64000-64100 remote.be:22,2222");
   console.log("");
 }
@@ -158,19 +158,19 @@ app.ws('/bash', function(ws, req) {
   });
 });
 
-if(argv["capath"] != undefined && argv["keypath"] != undefined) {
-  var privateKey = fs.readFileSync( argv["keypath"] );
-  var certificate = fs.readFileSync( argv["capath"] );
-
+if(argv["certpath"] != undefined && argv["keypath"] != undefined) {
+  options = {
+        key: fs.readFileSync( argv["keypath"] ),
+        cert: fs.readFileSync( argv["certpath"] );
+  }
+  if(argv["capath"] != undefined)
+    options["ca"] = fs.readFileSync( argv["capath"] );
   console.log('App listening to https://' + bind_hostname + ':' + bind_port);
-  https.createServer({
-      key: privateKey,
-      cert: certificate
-  }, app).listen(bind_port, bind_hostname);
+  https.createServer(options, app).listen(bind_port, bind_hostname);
 }
-else if(argv["capath"] != undefined || argv["keypath"] != undefined) {
+else if(argv["certpath"] != undefined || argv["keypath"] != undefined) {
   usage();
-  console.log('--capath and --keypath should be defined together or not at all');
+  console.log('--certpath and --keypath should be defined together or not at all');
 }
 else {
   console.log('App listening to http://' + bind_hostname + ':' + bind_port);

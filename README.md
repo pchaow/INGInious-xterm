@@ -16,7 +16,7 @@ Usage (command line)
 --------------------
 
 ```
-node app [--capath=path-to-cacert.pem --keypath=path-to-private-key.pem] HOST PORT rhostA:portA-portB,portC [rhostA:portA-portB,portC ...]
+node app [--certpath=path-to-cert.pem --keypath=path-to-private.key [--capath=path-to-ca.pem]] HOST PORT rhostA:portA-portB,portC [rhostA:portA-portB,portC ...]
 ```
 
 example:
