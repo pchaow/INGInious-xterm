@@ -161,7 +161,7 @@ app.ws('/bash', function(ws, req) {
 if(argv["certpath"] != undefined && argv["keypath"] != undefined) {
   options = {
         key: fs.readFileSync( argv["keypath"] ),
-        cert: fs.readFileSync( argv["certpath"] );
+        cert: fs.readFileSync( argv["certpath"] )
   }
   if(argv["capath"] != undefined)
     options["ca"] = fs.readFileSync( argv["capath"] );
