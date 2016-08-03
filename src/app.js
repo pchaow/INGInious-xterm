@@ -88,7 +88,7 @@ argv["_"].forEach(function (val, index, array) {
              Server creation
 \****************************************/
 var server = null;
-var https = false;
+var isHTTPS = false;
 //Create a HTTPS server
 if(argv["certpath"] != undefined && argv["keypath"] != undefined) {
   options = {
@@ -98,7 +98,7 @@ if(argv["certpath"] != undefined && argv["keypath"] != undefined) {
   if(argv["capath"] != undefined)
     options["ca"] = fs.readFileSync( argv["capath"] );
 
-  https = true;
+  isHTTPS = true;
   server = https.createServer(options, app);
 }
 //Invalid config
@@ -109,7 +109,7 @@ else if(argv["certpath"] != undefined || argv["keypath"] != undefined) {
 }
 //Create a HTTP server
 else {
-  https = false;
+  isHTTPS = false;
   server = http.createServer(app);
 }
 
@@ -199,7 +199,7 @@ app.ws('/bash', function(ws, req) {
                    Serve
 \****************************************/
 
-if(https)
+if(isHTTPS)
   console.log('App listening to https://' + bind_hostname + ':' + bind_port);
 else
   console.log('App listening to http://' + bind_hostname + ':' + bind_port);
