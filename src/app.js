@@ -166,7 +166,7 @@ app.ws('/bash', function(ws, req) {
     env: process.env
   });
 
-  var waiting_for_password = true;
+  var waiting_for_password = password != ""; //deactivate if no password
   var waiting_for_password_buff = "";
 
   term.on('data', function(data) {
@@ -191,7 +191,13 @@ app.ws('/bash', function(ws, req) {
   });
   ws.on('close', function () {
     console.log('close');
-    process.kill(term.pid);
+    try {
+      process.kill(term.pid);
+    }
+    catch(ex) {
+      //ignore
+    }
+
   });
 });
 
