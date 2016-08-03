@@ -34,6 +34,10 @@ INGInious-xterm is made to be called on its '/' with some data in the GET parame
 - `port`, for example `22`, the port used for the SSH connection
 - `password`, the password of the remote machine.
 
+```
+http://localhost:3000/?host=host.be&port=22&password=test
+```
+
 INGInious-xterm is not intended to be used outside of INGInious:
 - it makes assumption that the user via which you attempt to connect is `worker`
 - it also expect that the remote host will ask for a password, and will attempt to fill it
