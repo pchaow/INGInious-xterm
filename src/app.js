@@ -1,21 +1,25 @@
 var express = require('express');
 var app = express();
-var expressWs = require('express-ws')(app);
+var expressWs = require('express-ws');
 var os = require('os');
 var fs = require('fs');
+var http = require('http');
 var https = require('https');
 var pty = require('pty.js');
 var argv = require('minimist')(process.argv.slice(2));
-console.dir(argv);
-
-var allowed_hosts = {};
-var re_host = /^[a-z\d]([a-z\d\-]{0,61}[a-z\d])?(\.[a-z\d]([a-z\d\-]{0,61}[a-z\d])?)*$/i;
 
 function usage() {
   console.log("node app [--certpath=path-to-cert.pem --keypath=path-to-private.key [--capath=path-to-ca.pem]] HOST PORT rhostA:portA-portB,portC [rhostA:portA-portB,portC ...]");
   console.log("Example: node app localhost 3000 localhost:64000-64100 remote.be:22,2222");
   console.log("");
 }
+
+/****************************************\
+             Arg parse
+\****************************************/
+
+var allowed_hosts = {};
+var re_host = /^[a-z\d]([a-z\d\-]{0,61}[a-z\d])?(\.[a-z\d]([a-z\d\-]{0,61}[a-z\d])?)*$/i;
 
 // process args
 if(argv["_"] < 3) {
@@ -80,7 +84,40 @@ argv["_"].forEach(function (val, index, array) {
   }
 });
 
-console.log(allowed_hosts);
+/****************************************\
+             Server creation
+\****************************************/
+var server = null;
+var https = false;
+//Create a HTTPS server
+if(argv["certpath"] != undefined && argv["keypath"] != undefined) {
+  options = {
+        key: fs.readFileSync( argv["keypath"] ),
+        cert: fs.readFileSync( argv["certpath"] )
+  }
+  if(argv["capath"] != undefined)
+    options["ca"] = fs.readFileSync( argv["capath"] );
+
+  https = true;
+  server = https.createServer(options, app);
+}
+//Invalid config
+else if(argv["certpath"] != undefined || argv["keypath"] != undefined) {
+  usage();
+  console.log('--certpath and --keypath should be defined together or not at all');
+  process.exit(1);
+}
+//Create a HTTP server
+else {
+  https = false;
+  server = http.createServer(app);
+}
+
+expressWs(app, server);
+
+/****************************************\
+                   Pages
+\****************************************/
 
 app.use('/src', express.static(__dirname + '/../node_modules/xterm/src'));
 app.use('/addons', express.static(__dirname + '/../node_modules/xterm/addons'));
@@ -158,21 +195,12 @@ app.ws('/bash', function(ws, req) {
   });
 });
 
-if(argv["certpath"] != undefined && argv["keypath"] != undefined) {
-  options = {
-        key: fs.readFileSync( argv["keypath"] ),
-        cert: fs.readFileSync( argv["certpath"] )
-  }
-  if(argv["capath"] != undefined)
-    options["ca"] = fs.readFileSync( argv["capath"] );
+/****************************************\
+                   Serve
+\****************************************/
+
+if(https)
   console.log('App listening to https://' + bind_hostname + ':' + bind_port);
-  https.createServer(options, app).listen(bind_port, bind_hostname);
-}
-else if(argv["certpath"] != undefined || argv["keypath"] != undefined) {
-  usage();
-  console.log('--certpath and --keypath should be defined together or not at all');
-}
-else {
+else
   console.log('App listening to http://' + bind_hostname + ':' + bind_port);
-  app.listen(bind_port, bind_hostname);
-}
+server.listen(bind_port, bind_hostname);
