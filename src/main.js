@@ -30,6 +30,7 @@ function createTerminal(host, port, password) {
 
     term.open(terminalContainer);
     term.fit();
+    term.toggleFullscreen(true);
 
     socket.onopen = runRealTerminal;
     socket.onclose = runFakeTerminal;
