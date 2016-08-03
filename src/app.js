@@ -36,15 +36,15 @@ if(isNaN(bind_port)) {
   process.exit(1);
 }
 
-argv["_"].forEach(function (val, index, array) {
+argv["_"].forEach(function (val, index) {
   if(index >= 2) {
-    val = val.split(":")
+    val = val.split(":");
     if(val.length != 2) {
       usage();
       console.log('Hostnames should be in the form hostname.be:2222-2228,2230,2231');
       process.exit(1);
     }
-    hostname = val[0];
+    var hostname = val[0];
     if(hostname.match(re_host) == null) {
       usage();
       console.log('Invalid hostname: ' + hostname);
@@ -62,7 +62,7 @@ argv["_"].forEach(function (val, index, array) {
             console.log('Hostnames should be in the form hostname.be:2222-2228,2230,2231');
             process.exit(1);
           }
-          for(i = v[0]; i <= v[1]; i++)
+          for(var i = v[0]; i <= v[1]; i++)
             ports.push(i);
         }
         else {
@@ -94,7 +94,7 @@ if(argv["certpath"] != undefined && argv["keypath"] != undefined) {
   options = {
         key: fs.readFileSync( argv["keypath"] ),
         cert: fs.readFileSync( argv["certpath"] )
-  }
+  };
   if(argv["capath"] != undefined)
     options["ca"] = fs.readFileSync( argv["capath"] );
 
@@ -138,9 +138,9 @@ app.ws('/bash', function(ws, req) {
   /**
    * Open bash terminal and attach it
    */
-  var host = req.query.host
-  var port = parseInt(req.query.port)
-  var password = req.query.password
+  var host = req.query.host;
+  var port = parseInt(req.query.port);
+  var password = req.query.password;
 
   if(allowed_hosts[host] == undefined)
   {
