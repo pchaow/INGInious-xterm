@@ -22,7 +22,7 @@ node app [--certpath=path-to-cert.pem --keypath=path-to-private.key [--capath=pa
 example:
 
 ```
-npm start 0.0.0.0 3000 localhost=64000-64100
+npm start 0.0.0.0 3000 localhost:64000-64100
 ```
 
 Usage (in your browser)
