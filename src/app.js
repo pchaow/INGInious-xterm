@@ -5,7 +5,7 @@ var os = require('os');
 var fs = require('fs');
 var http = require('http');
 var https = require('https');
-var pty = require('pty.js');
+var pty = require('node-pty');
 var argv = require('minimist')(process.argv.slice(2));
 
 function usage() {

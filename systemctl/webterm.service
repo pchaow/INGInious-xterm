@@ -2,8 +2,8 @@
 Description=WebTerm
 
 [Service]
-WorkingDirectory=/fix/me/INGInious-xterm/src/
-ExecStart=/usr/bin/npm start 0.0.0.0 3000 my.ip.adress.or.hostname:64000-64100
+WorkingDirectory=/home/chaow/grader/xterm
+ExecStart=/usr/bin/npm start 0.0.0.0 3000 my.ip.adress.or.hostname:64000-64200
 
 Restart=always
 StartLimitInterval=30
